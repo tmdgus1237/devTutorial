@@ -2,8 +2,8 @@
   <div class="hello">
     <h1>{{ msg }}</h1>
     <div class="star">
-      <p v-for="(row,i) in 5" :key="i">
-        <span v-for="(star,j) in i" :key="j">*</span>
+      <p v-for="(row) in 5" :key="row">
+        <span v-for="(star,j) in row" :key="j">*</span>
       </p>
     </div>
   </div>
