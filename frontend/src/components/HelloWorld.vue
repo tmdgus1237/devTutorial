@@ -2,7 +2,10 @@
   <div class="hello">
     <h1>{{ msg }}</h1>
     <div class="star">
-      <p v-for="(row) in 5" :key="row">
+      <span>How many line? (1..100) </span>
+      <input type="text" @keyup.enter="getLines" placeholder="입력 후 Enter">
+      <p>{{ message }}</p>
+      <p v-for="(row, i) in Number(lines)" :key="i">
         <span v-for="(star,j) in row" :key="j">*</span>
       </p>
     </div>
@@ -16,7 +19,25 @@ export default defineComponent({
   name: 'HelloWorld',
   props: {
     msg: String,
-    star: String,
+  },
+  data() {
+    return{
+      lines: 0,
+      message: '',
+    }
+  },
+  methods : {
+    getLines(event:any) {
+      this.lines = Number(event.target.value); //.replace(/[^0-9]/g,'')
+      if(this.lines < 1 || this.lines > 100 ) {
+        this.message = "1~100 숫자를 입력하시오";
+        this.lines = 0;
+      }
+      else {
+        this.message = '';
+      }
+      console.log(this.lines);
+    },
   },
 });
 
@@ -39,7 +60,7 @@ a {
   color: #42b983;
 }
 p {
-  font-size: 30px;
+  font-size: 20px;
 }
 .star {
   text-align: left;
