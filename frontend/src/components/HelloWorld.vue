@@ -28,7 +28,14 @@ export default defineComponent({
   },
   methods : {
     getLines(event:any) {
-      this.lines = Number(event.target.value); //.replace(/[^0-9]/g,'')
+      let input = event.target.value;
+      if(input.search(/^[+-]?[0-9]/g)) {
+        this.message = "숫자를 입력하시오";
+        this.lines = 0;
+        console.log(event.target.value);
+        return;
+      }
+      this.lines = Number(event.target.value);
       if(this.lines < 1 || this.lines > 100 ) {
         this.message = "1~100 숫자를 입력하시오";
         this.lines = 0;
