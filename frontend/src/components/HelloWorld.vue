@@ -3,7 +3,7 @@
     <h1>{{ msg }}</h1>
     <div class="star">
       <span>How many line? (1..100) </span>
-      <input type="text" @keyup.enter="getLines" placeholder="입력 후 Enter">
+      <input type="number" @keyup.enter="getLines" placeholder="입력 후 Enter">
       <p>{{ message }}</p>
       <p v-for="(row, i) in Number(lines)" :key="i">
         <span v-for="(star,j) in row" :key="j">*</span>
@@ -28,13 +28,6 @@ export default defineComponent({
   },
   methods : {
     getLines(event:any) {
-      let input = event.target.value;
-      if(input.search(/^[+-]?[0-9]/g)) {
-        this.message = "숫자를 입력하시오";
-        this.lines = 0;
-        console.log(event.target.value);
-        return;
-      }
       this.lines = Number(event.target.value);
       if(this.lines < 1 || this.lines > 100 ) {
         this.message = "1~100 숫자를 입력하시오";
@@ -43,7 +36,6 @@ export default defineComponent({
       else {
         this.message = '';
       }
-      console.log(this.lines);
     },
   },
 });
