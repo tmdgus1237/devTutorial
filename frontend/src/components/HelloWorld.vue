@@ -5,14 +5,15 @@
       <div>
         <span>Choose your Pattern : </span>
         <select v-model="selected" @change="reset">
-          <option v-for="(p, i) in patterns" :key="i">{{ p }}</option>
+          <option disabled>Select your Pattern</option>
+          <option v-for="(p, i) in patterns" :key="i" v-bind:value="i">{{ p }}</option>
         </select>
         <p></p>
         <span>How many line? (1..100) : </span>
         <input type="number" @keyup.enter="getStars" placeholder="입력 후 Enter">
         <p>{{ message }}</p>
       </div>
-      <div :class="{patternA: selected == patterns[0], patternB: selected == patterns[1], patternC: selected == patterns[2]}"> 
+      <div v-bind:class="{patternA: selected == 0, patternB: selected == 1, patternC: selected == 2}"> 
         <p v-for="(row, index) in Number(lines)" :key="index">
           {{ stars[index] }}
         </p>
@@ -33,21 +34,32 @@ export default defineComponent({
     return{
       lines: 0,
       message: '',
-      selected: '',
+      selected: -1,
       patterns: ['Triangle','Inverted Triangle','Diamond'],
       stars: [''],
+    }
+  },
+  watch : {
+    patternAlign() {
+      
     }
   },
   methods : {
     getStars(event:any) {
       this.lines = Number(event.target.value);
-      if(this.lines < 1 || this.lines > 100 ) {
-        this.message = "1~100 숫자를 입력하시오";
+      if(this.lines < 1 || this.lines > 100 || this.lines % 1 != 0) {
+        this.message = "1~100 정수를 입력하시오";
         this.lines = 0;
       }
       else {
         this.message = '';
-        if(this.selected == this.patterns[2]){
+        if(this.selected == 0){
+          this.getTriangle();
+        }
+        else if(this.selected == 1){
+          this.getInvertedTriangle();
+        }
+        else if(this.selected == 2){
           if(this.lines % 2 == 0){
             this.reset();
             this.message = "Diamond Pattern은 홀수를 입력하시오."
@@ -55,18 +67,24 @@ export default defineComponent({
           }
           this.getDiamond();
         }
-        else{
-          this.getTriangle();
+        else {
+          this.message = "Pattern을 먼저 선택하시오."
         }
-        
       }
     },
 
     getTriangle(){
       this.stars[0] = '*';
-        for(let i = 1; i < this.lines; i++){
-          this.stars[i] = this.stars[i-1].concat('*');
-        }
+      for(let i = 1; i < this.lines; i++){
+        this.stars[i] = this.stars[i-1].concat('*');
+      }
+    },
+
+    getInvertedTriangle(){
+      this.stars[this.lines - 1] = '*';
+      for(let i = this.lines - 2; i >= 0; i--){
+        this.stars[i] = this.stars[i+1].concat('*');
+      }
     },
 
     getDiamond(){
