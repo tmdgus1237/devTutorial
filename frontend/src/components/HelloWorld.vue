@@ -13,7 +13,7 @@
         <input type="number" @keyup.enter="getStars" placeholder="입력 후 Enter">
         <p>{{ message }}</p>
       </div>
-      <div v-bind:class="{patternA: selected == 0, patternB: selected == 1, patternC: selected == 2}"> 
+      <div v-bind:class="{patternA: selected < 3, patternB: selected == 3, patternC: selected == 4}"> 
         <p v-for="(row, index) in Number(lines)" :key="index">
           {{ stars[index] }}
         </p>
@@ -24,6 +24,9 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import axios from 'axios';
+
+
 
 export default defineComponent({
   name: 'HelloWorld',
@@ -35,7 +38,7 @@ export default defineComponent({
       lines: 0,
       message: '',
       selected: -1,
-      patterns: ['Triangle','Inverted Triangle','Diamond'],
+      patterns: ['Triangle','Three Star','Inverted','Inverted Triangle','Diamond'],
       stars: [''],
     }
   },
@@ -53,49 +56,23 @@ export default defineComponent({
       }
       else {
         this.message = '';
-        if(this.selected == 0){
-          this.getTriangle();
+        if(this.selected == 4 && this.lines % 2 == 0){
+          this.reset();
+          this.message = "Diamond Pattern은 홀수를 입력하시오."
+          return;
         }
-        else if(this.selected == 1){
-          this.getInvertedTriangle();
-        }
-        else if(this.selected == 2){
-          if(this.lines % 2 == 0){
-            this.reset();
-            this.message = "Diamond Pattern은 홀수를 입력하시오."
-            return;
-          }
-          this.getDiamond();
-        }
-        else {
+        else if(this.selected == null){
           this.message = "Pattern을 먼저 선택하시오."
+          return;
         }
+        this.loadData();
       }
     },
 
-    getTriangle(){
-      this.stars[0] = '*';
-      for(let i = 1; i < this.lines; i++){
-        this.stars[i] = this.stars[i-1].concat('*');
-      }
-    },
-
-    getInvertedTriangle(){
-      this.stars[this.lines - 1] = '*';
-      for(let i = this.lines - 2; i >= 0; i--){
-        this.stars[i] = this.stars[i+1].concat('*');
-      }
-    },
-
-    getDiamond(){
-      this.stars[0] = '*';
-      this.stars[this.lines-1]='*';
-      let diaLines = this.lines/2;
-
-      for(let i = 1; i < diaLines; i++){
-        this.stars[i] = this.stars[i-1].concat('*');
-        this.stars[this.lines -1 - i] = this.stars[i];
-      }
+    loadData(){
+      axios.get('/api/star', {params: {pattern: this.selected, row: this.lines}}).then(response => {
+        this.stars = response.data;
+      })
     },
 
     reset() {
