@@ -8,7 +8,7 @@ plugins {
 
 println "### project.projectDir: ${project.projectDir}"
 
-node {
+/** node {
 	version = '14.19.1'
 	npmVersion = '8.6.0'
 	workDir = file("${project.projectDir}/../frontend")
@@ -16,6 +16,7 @@ node {
 	nodeProjectDir = file("${project.projectDir}/../frontend")
 	//nodeModulesDir = file("${project.projectDir}/../frontend")
 }
+*/
 
 
 group = 'com.starProject'

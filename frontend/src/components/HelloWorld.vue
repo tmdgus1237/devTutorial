@@ -24,7 +24,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 
 
 
@@ -61,7 +61,7 @@ export default defineComponent({
           this.message = "Diamond Pattern은 홀수를 입력하시오."
           return;
         }
-        else if(this.selected == null){
+        else if(this.selected == -1){
           this.message = "Pattern을 먼저 선택하시오."
           return;
         }
@@ -72,6 +72,8 @@ export default defineComponent({
     loadData(){
       axios.get('/api/star', {params: {pattern: this.selected, row: this.lines}}).then(response => {
         this.stars = response.data;
+      }).catch((e: AxiosError) =>{
+        this.message = e.message;
       })
     },
 
@@ -106,6 +108,6 @@ p {
 }
 .star {
   /* text-align: left; */
-  padding: 1% 30% 1% 30%;
+  padding: 1% 5% 1% 5%;
 }
 </style>

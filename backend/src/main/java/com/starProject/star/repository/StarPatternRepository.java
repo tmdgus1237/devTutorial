@@ -24,7 +24,10 @@ public class StarPatternRepository {
 			}
 			break;
 		case 1:
-			stars[row-1] = "***";
+			stars[row-1] = "*";
+			for(int i = 1; i < row; i++) {
+				stars[row-1] += "*";
+			}
 			for(int i = row-2; i >= 0; i--) {
 				stars[i] = "\u00a0" + stars[i+1];
 			}
@@ -43,6 +46,7 @@ public class StarPatternRepository {
 			break;
 		case 4:
 			stars[0] = "*";
+			if(row == 1) return stars;
 			stars[row-1] = stars[0];
 			for(int i = 1; i < row / 2; i++) {
 				stars[i] = stars[i-1] + "*";
