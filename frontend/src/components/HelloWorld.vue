@@ -1,5 +1,7 @@
 <template>
-  <div class="hello">
+
+  
+  <div class="left">  
     <h1>{{ msg }}</h1>
     <div class="star">
       <div>
@@ -11,25 +13,39 @@
         <p></p>
         <span>How many line? (1..100) : </span>
         <input type="number" @keyup.enter="getStars" placeholder="입력 후 Enter">
+        <p></p>
+        <span>History Count : </span>
+        <select v-model="histCnt" @change="resetHist">
+            <option v-for="(p, i) in 10" :key="i" v-bind:value="p">{{ p }}</option>
+        </select>
         <p>{{ message }}</p>
       </div>
-      <div v-bind:class="{patternA: selected < 3, patternB: selected == 3, patternC: selected == 4}"> 
-        <p v-for="(row, index) in Number(lines)" :key="index">
-          {{ stars[index] }}
-        </p>
-      </div>
+      <Pattern v-bind:patternStyle="selected" v-bind:pattern="stars" v-bind:row="lines" />
     </div>
   </div>
+  <div class="right">
+    <h1>Pattern History</h1>
+    <div v-for="(d, i) in Number(histCnt)" :key="i">
+      <p>#{{d}}</p>
+      <Pattern v-bind:patternStyle="histSelected[(end+d+1)%histCnt]" v-bind:pattern="histStars[(end+d+1)%histCnt]" v-bind:row="histLines[(end+d+1)%histCnt]" />
+    </div>
+  </div>
+  
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
 import axios, { AxiosError } from 'axios';
-
+// import PatternHistory from './PatternHistory.vue';
+import Pattern from './Pattern.vue';
 
 
 export default defineComponent({
   name: 'HelloWorld',
+  components: {
+    // PatternHistory,
+    Pattern,
+  },
   props: {
     msg: String,
   },
@@ -40,6 +56,12 @@ export default defineComponent({
       selected: -1,
       patterns: ['Triangle','Three Star','Inverted','Inverted Triangle','Diamond'],
       stars: [''],
+      histCnt: 1,
+      histSelected: [0],
+      histStars: [['']],
+      histLines: [0],
+      front: 0,
+      end: 0,
     }
   },
   watch : {
@@ -72,6 +94,15 @@ export default defineComponent({
     loadData(){
       axios.get('/api/star', {params: {pattern: this.selected, row: this.lines}}).then(response => {
         this.stars = response.data;
+  
+        this.histStars[this.end] = this.stars;
+        this.histSelected[this.end] = this.selected;
+        this.histLines[this.end] = this.lines;
+        this.end = (this.end+1)%this.histCnt;
+        console.log(this.end);
+        if(this.front == this.end) {
+          this.front = (this.front+1)%this.histCnt;
+        }
       }).catch((e: AxiosError) =>{
         this.message = e.message;
       })
@@ -81,6 +112,13 @@ export default defineComponent({
       this.stars= [''];
       this.message='';
     },
+
+    resetHist() {
+      this.front = 0;
+      this.end = 0;
+      this.histSelected= [0];
+      this.histStars= [['']];
+    }
   },
 });
 
@@ -109,5 +147,20 @@ p {
 .star {
   /* text-align: left; */
   padding: 1% 5% 1% 5%;
+}
+.left {
+  width: 70%;
+  height: 90%;
+  float: left;
+  box-sizing: border-box;
+  border: 1px solid #003458;
+}
+
+.right {
+  width: 30%;
+  height: 90%;
+  float: right;
+  box-sizing: border-box;
+  border: 1px solid #003458;
 }
 </style>
