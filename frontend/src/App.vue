@@ -38,5 +38,8 @@ export default defineComponent({
   
 }
 
+.info {
+  text-align: left;
+}
 
 </style>

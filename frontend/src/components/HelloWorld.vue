@@ -4,30 +4,36 @@
   <div class="left">  
     <h1>{{ msg }}</h1>
     <div class="star">
-      <div>
-        <span>Choose your Pattern : </span>
-        <select v-model="selected" @change="reset">
-          <option disabled>Select your Pattern</option>
-          <option v-for="(p, i) in patterns" :key="i" v-bind:value="i">{{ p }}</option>
-        </select>
-        <p></p>
-        <span>How many line? (1..100) : </span>
-        <input type="number" @keyup.enter="getStars" placeholder="입력 후 Enter">
-        <p></p>
-        <span>History Count : </span>
-        <select v-model="histCnt" @change="resetHist">
-            <option v-for="(p, i) in 10" :key="i" v-bind:value="p">{{ p }}</option>
-        </select>
+      <div class="info">
+        <p>
+          <span>Choose your Pattern : </span>
+          <select v-model="selected" @change="reset">
+            <option disabled>Select your Pattern</option>
+            <option v-for="(p, i) in patterns" :key="i" v-bind:value="i">{{ p }}</option>
+          </select>
+        </p>
+        <p>
+          <span>History Count : </span>
+          <select v-model="histCnt" @change="resetHist">
+              <option v-for="(p, i) in 10" :key="i" v-bind:value="p">{{ p }}</option>
+          </select>
+        </p>
+        <p>
+          <span>How many line? (1..100) : </span>
+          <input type="number" @keyup.enter="getStars" placeholder="입력 후 Enter">
+        </p>
         <p>{{ message }}</p>
       </div>
-      <Pattern v-bind:patternStyle="selected" v-bind:pattern="stars" v-bind:row="lines" />
+      <div>
+        <Pattern v-bind:patternStyle="selected" v-bind:pattern="stars" v-bind:row="lines" />
+      </div>
     </div>
   </div>
   <div class="right">
     <h1>Pattern History</h1>
-    <div v-for="(d, i) in Number(histCnt)" :key="i">
-      <p>#{{d}}</p>
-      <Pattern v-bind:patternStyle="histSelected[(end+d+1)%histCnt]" v-bind:pattern="histStars[(end+d+1)%histCnt]" v-bind:row="histLines[(end+d+1)%histCnt]" />
+    <div class="star" v-for="(d, i) in Number((end-front+max)%max)" :key="i">
+      <p class="info">Pattern #{{d}}</p>
+      <Pattern v-bind:patternStyle="histSelected[(max+end-d)%max]" v-bind:pattern="histStars[(max+end-d)%max]" v-bind:row="histLines[(max+end-d)%max]" />
     </div>
   </div>
   
@@ -62,6 +68,7 @@ export default defineComponent({
       histLines: [0],
       front: 0,
       end: 0,
+      max: 10,
     }
   },
   watch : {
@@ -98,14 +105,18 @@ export default defineComponent({
         this.histStars[this.end] = this.stars;
         this.histSelected[this.end] = this.selected;
         this.histLines[this.end] = this.lines;
-        this.end = (this.end+1)%this.histCnt;
-        console.log(this.end);
-        if(this.front == this.end) {
-          this.front = (this.front+1)%this.histCnt;
+        this.end = (this.end+1)%this.max;
+        // console.log(this.end);
+        if((this.end - this.front + this.max) % this.max > this.histCnt) {
+          this.front = (this.front+1)%this.max;
         }
       }).catch((e: AxiosError) =>{
         this.message = e.message;
       })
+    },
+
+    getMinHistCnt(){
+      return (this.end - this.front + this.max) % this.max;
     },
 
     reset() {
@@ -114,7 +125,7 @@ export default defineComponent({
     },
 
     resetHist() {
-      this.front = 0;
+      // this.front = 0;
       this.end = 0;
       this.histSelected= [0];
       this.histStars= [['']];
@@ -135,25 +146,16 @@ a {
 p {
   font-size: 20px;
 }
-.patternA {
-  text-align: left;
-}
-.patternB {
-  text-align: right;
-}
-.patternC {
-  text-align: center;
-}
 .star {
   /* text-align: left; */
   padding: 1% 5% 1% 5%;
 }
+
 .left {
   width: 70%;
   height: 90%;
   float: left;
   box-sizing: border-box;
-  border: 1px solid #003458;
 }
 
 .right {
@@ -161,6 +163,6 @@ p {
   height: 90%;
   float: right;
   box-sizing: border-box;
-  border: 1px solid #003458;
+  background: #d7f5e8;
 }
 </style>
