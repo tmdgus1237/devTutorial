@@ -1,6 +1,5 @@
 <template>
 
-  
   <div class="left">  
     <h1>{{ msg }}</h1>
     <div class="star">
@@ -125,7 +124,7 @@ export default defineComponent({
     },
 
     resetHist() {
-      // this.front = 0;
+      this.front = 0;
       this.end = 0;
       this.histSelected= [0];
       this.histStars= [['']];
@@ -136,7 +135,7 @@ export default defineComponent({
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
+<style>
 h3 {
   margin: 40px 0 0;
 }
@@ -148,21 +147,24 @@ p {
 }
 .star {
   /* text-align: left; */
-  padding: 1% 5% 1% 5%;
+  padding: 1% 2% 1% 2%;
 }
 
 .left {
+  overflow: scroll;
   width: 70%;
   height: 90%;
   float: left;
-  box-sizing: border-box;
+  box-sizing: content-box;
 }
 
 .right {
+  overflow: scroll;
   width: 30%;
+  padding-bottom: 75%;
   height: 90%;
   float: right;
-  box-sizing: border-box;
+  box-sizing: content-box;
   background: #d7f5e8;
 }
 </style>
