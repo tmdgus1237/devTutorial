@@ -19,21 +19,26 @@
         </p>
         <p>
           <span>How many line? (1..100) : </span>
-          <input type="number" @keyup.enter="getStars" placeholder="입력 후 Enter">
+          <input type="number" @keyup.enter="getStars" placeholder="입력 후 Enter" @change="reset">
         </p>
         <p>{{ message }}</p>
       </div>
-      <div>
+      <div v-bind:class="{short: openTF == false, full: openTF == true}">
         <Pattern v-bind:patternStyle="selected" v-bind:pattern="stars" v-bind:row="lines" />
       </div>
+      <a href="#" class="btn_open" @click="openDetail">{{openMsg}}</a>
     </div>
   </div>
   <div class="right">
     <h1>Pattern History</h1>
-    <div class="star" v-for="(d, i) in Number((end-front+max)%max)" :key="i">
-      <p class="info">Pattern #{{d}}</p>
-      <Pattern v-bind:patternStyle="histSelected[(max+end-d)%max]" v-bind:pattern="histStars[(max+end-d)%max]" v-bind:row="histLines[(max+end-d)%max]" />
+    <button v-on:click="openHstDetail">{{openHstMsg}}</button>
+    <div v-bind:class="{hide: openHstTF == false, show: openHstTF == true}">
+      <div class="star" v-for="(d, i) in Number((end-front+max)%max)" :key="i">
+        <p class="info">Pattern #{{d}}</p>
+        <Pattern v-bind:patternStyle="histSelected[(max+end-d)%max]" v-bind:pattern="histStars[(max+end-d)%max]" v-bind:row="histLines[(max+end-d)%max]" />
+      </div>
     </div>
+    
   </div>
   
 </template>
@@ -59,7 +64,7 @@ export default defineComponent({
       lines: 0,
       message: '',
       selected: -1,
-      patterns: ['Triangle','Three Star','Inverted','Inverted Triangle','Diamond'],
+      patterns: ['Triangle','Repeat Triangle','Three Star','Inverted','Inverted Triangle','Diamond'],
       stars: [''],
       histCnt: 1,
       histSelected: [0],
@@ -68,6 +73,10 @@ export default defineComponent({
       front: 0,
       end: 0,
       max: 10,
+      openTF: false,
+      openMsg: "더보기",
+      openHstTF: false,
+      openHstMsg: "Show History Pattern",
     }
   },
   watch : {
@@ -100,6 +109,7 @@ export default defineComponent({
     loadData(){
       axios.get('/api/star', {params: {pattern: this.selected, row: this.lines}}).then(response => {
         this.stars = response.data;
+        if(this.selected == 1) this.lines = this.lines*(this.lines+1)/2;
   
         this.histStars[this.end] = this.stars;
         this.histSelected[this.end] = this.selected;
@@ -114,6 +124,28 @@ export default defineComponent({
       })
     },
 
+    openDetail(){
+      if(this.openTF == false){
+        this.openTF = true;
+        this.openMsg = "감추기";
+      }
+      else{
+        this.openTF = false;
+        this.openMsg = "더보기";
+      }
+    },
+
+    openHstDetail(){
+      if(this.openHstTF == false){
+        this.openHstTF = true;
+        this.openHstMsg = "Hide History Pattern";
+      }
+      else{
+        this.openHstTF = false;
+        this.openHstMsg = "Show History Pattern";
+      }
+    },
+
     getMinHistCnt(){
       return (this.end - this.front + this.max) % this.max;
     },
@@ -121,6 +153,7 @@ export default defineComponent({
     reset() {
       this.stars= [''];
       this.message='';
+      this.openTF = false;
     },
 
     resetHist() {
@@ -166,5 +199,22 @@ p {
   float: right;
   box-sizing: content-box;
   background: #d7f5e8;
+}
+
+.short {
+  max-height: 600px;
+  overflow: hidden;
+}
+
+.full {
+  overflow: scroll;
+}
+
+.hide{
+  display: none;
+}
+
+.show{
+  display: block;
 }
 </style>

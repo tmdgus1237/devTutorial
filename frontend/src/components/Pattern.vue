@@ -1,5 +1,5 @@
 <template>   
-    <div v-bind:class="{patternA: patternStyle < 3, patternB: patternStyle == 3, patternC: patternStyle == 4}"> 
+    <div v-bind:class="{patternA: patternStyle < 4, patternB: patternStyle == 4, patternC: patternStyle == 5}"> 
         <p v-for="(row, index) in Number(row)" :key="index">
             {{ pattern[index] }}
         </p>
@@ -26,6 +26,10 @@ export default defineComponent({
 </script>
 
 <style scoped>
+p {
+    line-height: 0.5px;
+}
+
 .patternA {
   text-align: left;
 }

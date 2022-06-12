@@ -18,12 +18,15 @@ public class StarPatternRepository {
 		
 		switch(p) {
 		case 0:
-			stars[0] = "*";
-			for(int i = 1; i < row; i++) {
-				stars[i] = stars[i-1] + "*";
-			}
+			makeTriangle(row, 0, stars);
 			break;
 		case 1:
+			stars = new String[row*(row+1)/2];
+			for(int i = 1; i <= row; i++) {
+				makeTriangle(i, (i*(i-1)/2), stars);
+			}
+			break;
+		case 2:
 			stars[row-1] = "*";
 			for(int i = 1; i < row; i++) {
 				stars[row-1] += "*";
@@ -32,19 +35,19 @@ public class StarPatternRepository {
 				stars[i] = "\u00a0" + stars[i+1];
 			}
 			break;
-		case 2:
+		case 3:
 			stars[row-1] = "*";
 			for(int i = row-2; i >= 0; i--) {
 				stars[i] = "\u00a0" + stars[i+1] + "*";
 			}
 			break;
-		case 3:
+		case 4:
 			stars[row-1] = "*";
 			for(int i = row-2; i >= 0; i--) {
 				stars[i] = stars[i+1] + "*";
 			}
 			break;
-		case 4:
+		case 5:
 			stars[0] = "*";
 			if(row == 1) return stars;
 			stars[row-1] = stars[0];
@@ -60,6 +63,13 @@ public class StarPatternRepository {
 		
 		
 		return stars;
+	}
+	
+	private void makeTriangle(int row, int index, String[] stars) {
+		stars[index] = "*";
+		for(int i = index+1; i < index+row; i++) {
+			stars[i] = stars[i-1] + "*";
+		}
 	}
 	
 	
