@@ -23,15 +23,17 @@
         </p>
         <p>{{ message }}</p>
       </div>
-      <div v-bind:class="{short: openTF == false, full: openTF == true}">
+      <div v-bind:class="{short: showDetail == false, full: showDetail == true}">
         <Pattern v-bind:patternStyle="selected" v-bind:pattern="stars" v-bind:row="lines" />
       </div>
-      <a href="#" class="btn_open" @click="openDetail">{{openMsg}}</a>
+      <a href="#" v-if="showDetail==false" @click="openDetail">더보기</a>
+      <a href="#" v-else @click="openDetail">감추기</a>
     </div>
   </div>
   <div class="right">
     <h1>Pattern History</h1>
-    <button v-on:click="openHstDetail">{{openHstMsg}}</button>
+    <button v-if="showDetailHst==false" v-on:click="openDetailHst">Show History Pattern</button>
+    <button v-else v-on:click="openDetailHst">Hide History Pattern</button>
     <div v-bind:class="{hide: openHstTF == false, show: openHstTF == true}">
       <div class="star" v-for="(d, i) in Number((end-front+max)%max)" :key="i">
         <p class="info">Pattern #{{d}}</p>
@@ -73,10 +75,8 @@ export default defineComponent({
       front: 0,
       end: 0,
       max: 10,
-      openTF: false,
-      openMsg: "더보기",
-      openHstTF: false,
-      openHstMsg: "Show History Pattern",
+      showDetail: false,
+      showDetailHst: false,
     }
   },
   watch : {
@@ -125,25 +125,11 @@ export default defineComponent({
     },
 
     openDetail(){
-      if(this.openTF == false){
-        this.openTF = true;
-        this.openMsg = "감추기";
-      }
-      else{
-        this.openTF = false;
-        this.openMsg = "더보기";
-      }
+      this.showDetail == false ? this.showDetail = true : this.showDetail = false;
     },
 
-    openHstDetail(){
-      if(this.openHstTF == false){
-        this.openHstTF = true;
-        this.openHstMsg = "Hide History Pattern";
-      }
-      else{
-        this.openHstTF = false;
-        this.openHstMsg = "Show History Pattern";
-      }
+    openDetailHst(){
+      this.showDetailHst == false ? this.showDetailHst = true : this.showDetailHst = false;
     },
 
     getMinHistCnt(){
@@ -153,7 +139,7 @@ export default defineComponent({
     reset() {
       this.stars= [''];
       this.message='';
-      this.openTF = false;
+      this.showDetail = false;
     },
 
     resetHist() {
