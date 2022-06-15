@@ -23,18 +23,21 @@
         </p>
         <p>{{ message }}</p>
       </div>
-      <div v-bind:class="{short: showDetail == false, full: showDetail == true}">
-        <Pattern v-bind:patternStyle="selected" v-bind:pattern="stars" v-bind:row="lines" />
+
+      <div v-bind:class="{short: showDetail == false, full: showDetail == true}" id="pattern-box">
+        <Pattern v-bind:patternStyle="selected" v-bind:pattern="stars" v-bind:row="showLines" @change="test" />
       </div>
-      <a href="#" v-if="showDetail==false" @click="openDetail">더보기</a>
-      <a href="#" v-else @click="openDetail">감추기</a>
+      <a href="#" v-if="showDetail==false" @click="openDetail" v-bind:class="{hide: showLines < defaultShowLines, show: showLines == defaultShowLines}">더보기</a>
+      <a href="#" v-else @click="openDetail" class=show>감추기</a>
     </div>
+
   </div>
+
   <div class="right">
     <h1>Pattern History</h1>
     <button v-if="showDetailHst==false" v-on:click="openDetailHst">Show History Pattern</button>
     <button v-else v-on:click="openDetailHst">Hide History Pattern</button>
-    <div v-bind:class="{hide: openHstTF == false, show: openHstTF == true}">
+    <div v-bind:class="{hide: showDetailHst == false, show: showDetailHst == true}">
       <div class="star" v-for="(d, i) in Number((end-front+max)%max)" :key="i">
         <p class="info">Pattern #{{d}}</p>
         <Pattern v-bind:patternStyle="histSelected[(max+end-d)%max]" v-bind:pattern="histStars[(max+end-d)%max]" v-bind:row="histLines[(max+end-d)%max]" />
@@ -48,14 +51,11 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import axios, { AxiosError } from 'axios';
-// import PatternHistory from './PatternHistory.vue';
 import Pattern from './Pattern.vue';
-
 
 export default defineComponent({
   name: 'HelloWorld',
   components: {
-    // PatternHistory,
     Pattern,
   },
   props: {
@@ -63,20 +63,27 @@ export default defineComponent({
   },
   data() {
     return{
+      // Pattern
       lines: 0,
       message: '',
       selected: -1,
       patterns: ['Triangle','Repeat Triangle','Three Star','Inverted','Inverted Triangle','Diamond'],
       stars: [''],
+      
+      // history 기능
       histCnt: 1,
       histSelected: [0],
       histStars: [['']],
       histLines: [0],
       front: 0,
       end: 0,
-      max: 10,
+      max: 12,
+
+      // 더보기
       showDetail: false,
       showDetailHst: false,
+      showLines: 0,
+      defaultShowLines: 20,
     }
   },
   watch : {
@@ -109,37 +116,42 @@ export default defineComponent({
     loadData(){
       axios.get('/api/star', {params: {pattern: this.selected, row: this.lines}}).then(response => {
         this.stars = response.data;
-        if(this.selected == 1) this.lines = this.lines*(this.lines+1)/2;
+        if(this.selected == 1) this.lines = this.lines*(this.lines+1)/2 + this.lines;
   
         this.histStars[this.end] = this.stars;
         this.histSelected[this.end] = this.selected;
         this.histLines[this.end] = this.lines;
         this.end = (this.end+1)%this.max;
-        // console.log(this.end);
+
         if((this.end - this.front + this.max) % this.max > this.histCnt) {
           this.front = (this.front+1)%this.max;
         }
+
+        this.showLines = (this.lines <= this.defaultShowLines) ? this.lines : this.defaultShowLines;
       }).catch((e: AxiosError) =>{
         this.message = e.message;
       })
     },
 
     openDetail(){
-      this.showDetail == false ? this.showDetail = true : this.showDetail = false;
+      if(this.showDetail == false){
+        this.showDetail = true;
+        this.showLines = this.lines;
+      } else{
+        this.showDetail = false;
+        this.showLines = this.defaultShowLines;
+      }
     },
 
     openDetailHst(){
-      this.showDetailHst == false ? this.showDetailHst = true : this.showDetailHst = false;
-    },
-
-    getMinHistCnt(){
-      return (this.end - this.front + this.max) % this.max;
+      this.showDetailHst = (this.showDetailHst == false ? true : false);
     },
 
     reset() {
       this.stars= [''];
       this.message='';
       this.showDetail = false;
+      this.showLines = 0;
     },
 
     resetHist() {

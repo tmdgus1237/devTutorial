@@ -21,9 +21,11 @@ public class StarPatternRepository {
 			makeTriangle(row, 0, stars);
 			break;
 		case 1:
-			stars = new String[row*(row+1)/2];
+			stars = new String[(row*(row+1)/2)+row];
 			for(int i = 1; i <= row; i++) {
-				makeTriangle(i, (i*(i-1)/2), stars);
+				int index = (i*(i-1)/2) + i -1;
+				makeTriangle(i, index, stars);
+				stars[index+i] = "\u00a0";
 			}
 			break;
 		case 2:
