@@ -23,24 +23,20 @@
         </p>
         <p>{{ message }}</p>
       </div>
-
-      <div v-bind:class="{short: showDetail == false, full: showDetail == true}" id="pattern-box">
-        <Pattern v-bind:patternStyle="selected" v-bind:pattern="stars" v-bind:row="showLines" @change="test" />
+      <div id="pattern-box">
+        <Pattern v-bind:patternStyle="selected" v-bind:pattern="stars" v-bind:row="lines" @change="test" />
       </div>
-      <a href="#" v-if="showDetail==false" @click="openDetail" v-bind:class="{hide: showLines < defaultShowLines, show: showLines == defaultShowLines}">더보기</a>
-      <a href="#" v-else @click="openDetail" class=show>감추기</a>
+
     </div>
 
   </div>
 
   <div class="right">
     <h1>Pattern History</h1>
-    <button v-if="showDetailHst==false" v-on:click="openDetailHst">Show History Pattern</button>
-    <button v-else v-on:click="openDetailHst">Hide History Pattern</button>
-    <div v-bind:class="{hide: showDetailHst == false, show: showDetailHst == true}">
+    <div>
       <div class="star" v-for="(d, i) in Number((end-front+max)%max)" :key="i">
         <p class="info">Pattern #{{d}}</p>
-        <Pattern v-bind:patternStyle="histSelected[(max+end-d)%max]" v-bind:pattern="histStars[(max+end-d)%max]" v-bind:row="histLines[(max+end-d)%max]" />
+        <Pattern v-bind:num="(max+end-d)%max" v-bind:patternStyle="histSelected[(max+end-d)%max]" v-bind:pattern="histStars[(max+end-d)%max]" v-bind:row="histLines[(max+end-d)%max]" />
       </div>
     </div>
     
@@ -78,12 +74,6 @@ export default defineComponent({
       front: 0,
       end: 0,
       max: 12,
-
-      // 더보기
-      showDetail: false,
-      showDetailHst: false,
-      showLines: 0,
-      defaultShowLines: 20,
     }
   },
   watch : {
@@ -126,32 +116,14 @@ export default defineComponent({
         if((this.end - this.front + this.max) % this.max > this.histCnt) {
           this.front = (this.front+1)%this.max;
         }
-
-        this.showLines = (this.lines <= this.defaultShowLines) ? this.lines : this.defaultShowLines;
       }).catch((e: AxiosError) =>{
         this.message = e.message;
       })
     },
 
-    openDetail(){
-      if(this.showDetail == false){
-        this.showDetail = true;
-        this.showLines = this.lines;
-      } else{
-        this.showDetail = false;
-        this.showLines = this.defaultShowLines;
-      }
-    },
-
-    openDetailHst(){
-      this.showDetailHst = (this.showDetailHst == false ? true : false);
-    },
-
     reset() {
       this.stars= [''];
       this.message='';
-      this.showDetail = false;
-      this.showLines = 0;
     },
 
     resetHist() {
@@ -197,15 +169,6 @@ p {
   float: right;
   box-sizing: content-box;
   background: #d7f5e8;
-}
-
-.short {
-  max-height: 600px;
-  overflow: hidden;
-}
-
-.full {
-  overflow: scroll;
 }
 
 .hide{
