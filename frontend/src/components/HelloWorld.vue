@@ -90,7 +90,7 @@ export default defineComponent({
       }
       else {
         this.message = '';
-        if(this.selected == 4 && this.lines % 2 == 0){
+        if(this.selected == 5 && this.lines % 2 == 0){
           this.reset();
           this.message = "Diamond Pattern은 홀수를 입력하시오."
           return;
